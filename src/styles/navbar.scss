@@ -1,0 +1,41 @@
+.nav_head {
+  font-size: 1.5em;
+  height: 75px;
+  background-color: #a055e1;
+  line-height: 75px;
+  a {
+    display: block;
+    text-decoration: none;
+    color: #ffffff;
+    padding: 0 16px;
+  }
+}
+.nav_container {
+  height: 75px;
+  width: 85%;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.logo {
+  float: left;
+}
+
+nav {
+  float: right;
+}
+
+.nav-item {
+  float: left;
+  list-style-type: none;
+  text-align: center;
+  border-right: 1px solid white;
+}
+
+.nav-item:hover:not(.active) {
+  background-color: #4603b3;
+}
+
+.active {
+  background-color: #4caf50;
+}
