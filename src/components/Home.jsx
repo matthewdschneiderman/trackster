@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import Modal from 'react-modal';
 import axios from 'axios'
 
@@ -23,7 +23,7 @@ const Home = () => {
   const [toDoTasks, setToDoTasks] = useState([]);
   const [goal, setGoal] = useState("");
   const [days, setDays] = useState(1);
-  let [compDays, setCompDays] = useState(0);
+  // let [compDays, setCompDays] = useState(0);
   
   function openModal() {
     setIsOpen(true);
@@ -45,24 +45,32 @@ const Home = () => {
   const dayInput = (e) => {
     setDays(e.target.value)
   }
+  ///////////////////Modal////////////////////////
+  
+  useEffect(() => {
+    getGoals();
+  }, [])
+  
+  
+  
   const getGoals = () => {
-    console.log('dhiihihih')
     axios.get('/goals').then(({data}) => {
       setToDoTasks(data)
-      console.log('hiihihih')
     }).catch((err) => {
       console.error(err)
     })
   }
+
+
   
   const addToDo = (e) => {
     e.preventDefault();
     let newGoal = {
       goal,
-      days
+      days,
+      compDays: 0,
     }
     axios.post('/goals', newGoal).then(() => {
-      console.log('Created34343!')
       getGoals();
     }).catch((err) => {
       console.error(err)
@@ -73,15 +81,27 @@ const Home = () => {
   
 
   
-  const goalCompleted = () => {
-    setCompDays(compDays += 1)
+  // const goalCompleted = () => {
+  //   setCompDays(compDays += 1)
+  // }
+
+  const goalCompleted = (updateObj) => {
+    axios.put('/goals', ({goalUpdates: updateObj})).then((compDay) => {
+      console.log("compDay", compDay)
+      // setCompDays(compDay)
+      getGoals();
+    }).catch((err) => {
+      console.error(err)
+    })
   }
 
   const deleteGoal = (idx) => {
-    console.log('funIdx', idx)
-    let newGoals = [...toDoTasks];
-    newGoals.splice(idx, 1)
-    setToDoTasks(newGoals)
+    axios.delete(`/goals?idx=${idx}`).then(() => {
+      console.log('deleted!!')
+    }).catch((err) => {
+      console.error(err)
+    })
+    getGoals()
   }
 
   return (
@@ -115,14 +135,21 @@ const Home = () => {
           </form>
         </Modal>
       {/* <button onClick={addToDo}>+</button> */}
-      {console.log("toDoTasks", toDoTasks)}
       <div>{toDoTasks.map((task, idx) => 
         <div key={idx}>
-          {console.log('idx', idx)}
-          <button onClick={() => deleteGoal(idx)}>X</button>
+          <button onClick={() => deleteGoal(task._id)}>X</button>
           <div>{task.goal}</div>
-          <div>{compDays}/{task.days}</div>
-          <button onClick={goalCompleted}>Goal Complete?</button>
+          <div>{task.compDays}/{task.days}</div>
+          { task.compDays < task.days ?
+          <span>
+          <button onClick={() => goalCompleted({id: task._id, currGoalNum: task.compDays, increase: false})}>Decrease Counter</button>
+          <button onClick={() => goalCompleted({id: task._id, currGoalNum: task.compDays, increase: true})}>Increase Counter</button> 
+          </span> :
+          <div>
+            <button onClick={() => goalCompleted({id: task._id, currGoalNum: task.compDays, increase: false})}>Decrease Counter</button>
+            <div>Goal Completed!!!!!!!!!</div>
+          </div>
+          }
       </div>
         )}
     </div>

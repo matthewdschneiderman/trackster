@@ -10,6 +10,8 @@ app.use(express.urlencoded({ extended: false }));
 
 app.post('/goals', db.post);
 app.get('/goals', db.get);
+app.delete('/goals', db.delete);
+app.put('/goals', db.put);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

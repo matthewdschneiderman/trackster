@@ -13,6 +13,7 @@ db.once('open', function () {
 const goalSchema = new mongoose.Schema({
   goal: String,
   days: Number,
+  compDays: Number,
 });
 
 const Goal = mongoose.model('Goal', goalSchema);
@@ -39,3 +40,40 @@ module.exports.get = (req, res) => {
       console.error(err);
     });
 };
+
+module.exports.delete = (req, res) => {
+  Goal.deleteOne({_id: req.query.idx})
+    .then(() => {
+      res.sendStatus(200);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
+
+module.exports.put = (req, res) => {
+  if (req.body.goalUpdates.increase) {
+    Goal.findOneAndUpdate({_id: req.body.goalUpdates.id}, {compDays: req.body.goalUpdates.currGoalNum + 1}, {new: true})
+      .then(() => {
+        res.sendStatus(200);
+    })
+      .catch((err) => {
+        console.error(err);
+    });
+  } else if (!req.body.goalUpdates.increase && req.body.goalUpdates.currGoalNum > 0) {
+    Goal.findOneAndUpdate({_id: req.body.goalUpdates.id}, {compDays: req.body.goalUpdates.currGoalNum - 1}, {new: true})
+      .then(() => {
+        res.sendStatus(200);
+    })
+      .catch((err) => {
+        console.error(err);
+    });
+  } else {
+    res.sendStatus(200)
+  }
+};
+
+// Tank.updateOne({ size: 'large' }, { name: 'T-90' }, function(err, res) {
+  // Updated at most one doc, `res.modifiedCount` contains the number
+  // of docs that MongoDB updated
+// });
